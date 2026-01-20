@@ -1,0 +1,1158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🌾 Farmer Identity & Land Verification</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            overflow-x: hidden;
+        }
+
+        .page {
+            display: none;
+            min-height: 100vh;
+            position: relative;
+        }
+
+        .page.active {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* HOME PAGE */
+        #homePage {
+            background: linear-gradient(135deg, #fef3c7 0%, #d9f99d 50%, #fef08a 100%);
+            position: relative;
+        }
+
+        .background-overlay {
+            position: absolute;
+            inset: 0;
+            opacity: 0.1;
+            background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23000000' fill-opacity='0.4'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+            pointer-events: none;
+        }
+
+        .content-container {
+            position: relative;
+            z-index: 10;
+            padding: 2rem;
+            text-align: center;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .header-section {
+            margin-bottom: 3rem;
+        }
+
+        .icon-wheat {
+            font-size: 5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .main-title {
+            font-size: 3.5rem;
+            font-weight: bold;
+            color: #000;
+            margin-bottom: 1rem;
+        }
+
+        .subtitle {
+            font-size: 1.25rem;
+            color: #374151;
+            max-width: 700px;
+            margin: 0 auto;
+            margin-top: 1.5rem;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 1.5rem;
+            justify-content: center;
+            margin: 2rem 0 4rem;
+        }
+
+        .btn {
+            padding: 1rem 2.5rem;
+            font-size: 1.125rem;
+            font-weight: 600;
+            border: none;
+            border-radius: 0.5rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+        }
+
+        .btn-login {
+            background: white;
+            color: #15803d;
+            border: 2px solid #15803d;
+        }
+
+        .btn-signup {
+            background: #15803d;
+            color: white;
+        }
+
+        .btn-signup:hover {
+            background: #166534;
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        .feature-card {
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(10px);
+            padding: 1.5rem;
+            border-radius: 0.5rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+
+        .feature-card h3 {
+            color: #15803d;
+            font-size: 1.125rem;
+            margin-bottom: 0.5rem;
+            font-weight: bold;
+        }
+
+        .feature-card p {
+            color: #4b5563;
+            font-size: 0.9rem;
+        }
+
+        /* FORM PAGES */
+        #signupPage, #loginPage, #uidPage, #farmerDetailsPage {
+            background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%);
+        }
+
+        .back-btn {
+            position: absolute;
+            top: 2rem;
+            left: 2rem;
+            padding: 0.75rem 1.5rem;
+            background: transparent;
+            border: none;
+            color: #15803d;
+            font-weight: 600;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: color 0.3s ease;
+        }
+
+        .back-btn:hover {
+            color: #166534;
+        }
+
+        .form-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            padding: 2rem;
+        }
+
+        .form-card {
+            background: white;
+            border-radius: 1rem;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+            padding: 3rem;
+            width: 100%;
+            max-width: 550px;
+        }
+
+        .form-header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .form-icon {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+        }
+
+        .form-header h2 {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #1f2937;
+            margin-bottom: 0.5rem;
+        }
+
+        .form-header p {
+            color: #6b7280;
+            font-size: 1rem;
+        }
+
+        .input-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .input-group label {
+            display: block;
+            color: #374151;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            font-size: 0.95rem;
+        }
+
+        .input-group input {
+            width: 100%;
+            padding: 0.875rem 1rem;
+            border: 2px solid #d1d5db;
+            border-radius: 0.5rem;
+            font-size: 1rem;
+            transition: border-color 0.3s ease;
+        }
+
+        .input-group input:focus {
+            outline: none;
+            border-color: #10b981;
+        }
+
+        .btn-primary {
+            width: 100%;
+            padding: 0.875rem;
+            background: #16a34a;
+            color: white;
+            font-weight: 600;
+            font-size: 1rem;
+            border: none;
+            border-radius: 0.5rem;
+            cursor: pointer;
+            transition: background 0.3s ease;
+            margin-bottom: 1rem;
+        }
+
+        .btn-primary:hover {
+            background: #15803d;
+        }
+
+        .btn-primary:disabled {
+            background: #9ca3af;
+            cursor: not-allowed;
+        }
+
+        .btn-secondary {
+            width: 100%;
+            padding: 0.875rem;
+            background: white;
+            color: #15803d;
+            font-weight: 600;
+            font-size: 1rem;
+            border: 2px solid #15803d;
+            border-radius: 0.5rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-bottom: 1rem;
+        }
+
+        .btn-secondary:hover {
+            background: #15803d;
+            color: white;
+        }
+
+        /* NEW: Clarification Request Button */
+        .btn-clarification {
+            background: #f59e0b;
+            color: white;
+            border: 2px solid #d97706;
+            padding: 0.75rem 1.5rem;
+            font-size: 0.95rem;
+            margin-top: 1rem;
+            width: auto;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn-clarification:hover {
+            background: #d97706;
+            transform: scale(1.02);
+        }
+
+        /* PROFILE ACTION BUTTONS */
+        .profile-actions {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+            margin: 2rem 0;
+        }
+
+        .profile-actions .btn {
+            width: 100%;
+            justify-content: center;
+            padding: 1rem;
+            font-size: 1rem;
+        }
+
+        .form-footer {
+            text-align: center;
+            color: #6b7280;
+            font-size: 0.9rem;
+            margin-top: 1.5rem;
+        }
+
+        .form-footer a {
+            color: #16a34a;
+            font-weight: 600;
+            text-decoration: none;
+        }
+
+        .form-footer a:hover {
+            text-decoration: underline;
+        }
+
+        .info-box {
+            margin-top: 2rem;
+            background: #d1fae5;
+            border-left: 4px solid #10b981;
+            padding: 1rem;
+            border-radius: 0.25rem;
+        }
+
+        .info-box p {
+            color: #374151;
+            font-size: 0.875rem;
+            line-height: 1.5;
+        }
+
+        .info-box strong {
+            color: #15803d;
+        }
+
+        .success-box {
+            background: #d1fae5;
+            border: 2px solid #10b981;
+            padding: 1.5rem;
+            border-radius: 0.5rem;
+            margin-bottom: 1.5rem;
+            text-align: left;
+        }
+
+        .success-box h3 {
+            color: #15803d;
+            margin-bottom: 1rem;
+            font-size: 1.2rem;
+        }
+
+        .success-box p {
+            color: #15803d;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+        }
+
+        .error-box {
+            background: #fee2e2;
+            border: 2px solid #ef4444;
+            padding: 1.5rem;
+            border-radius: 0.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .error-box p {
+            color: #dc2626;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            line-height: 1.6;
+        }
+
+        /* NEW: Clarification Request Section */
+        .clarification-section {
+            background: #fef3c7;
+            border: 2px solid #f59e0b;
+            border-radius: 0.75rem;
+            padding: 1.5rem;
+            margin: 1.5rem 0;
+        }
+
+        .clarification-section h3 {
+            color: #b45309;
+            margin-bottom: 1rem;
+            font-size: 1.2rem;
+        }
+
+        .request-details {
+            background: white;
+            border-radius: 0.5rem;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .request-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 0.5rem 0;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        .request-item:last-child {
+            border-bottom: none;
+        }
+
+        .request-label {
+            font-weight: 600;
+            color: #374151;
+        }
+
+        .request-value {
+            color: #1f2937;
+            font-family: monospace;
+        }
+
+        .output-options {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .output-btn {
+            flex: 1;
+            min-width: 150px;
+            padding: 0.875rem;
+            border: 2px solid #10b981;
+            background: white;
+            color: #15803d;
+            border-radius: 0.5rem;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .output-btn:hover {
+            background: #10b981;
+            color: white;
+        }
+
+        .loading {
+            display: inline-block;
+            width: 1rem;
+            height: 1rem;
+            border: 2px solid #fff;
+            border-top-color: transparent;
+            border-radius: 50%;
+            animation: spin 0.6s linear infinite;
+            margin-right: 0.5rem;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .farmer-details-grid {
+            display: grid;
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .detail-item {
+            background: #f8fafc;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            border-left: 4px solid #10b981;
+        }
+
+        .detail-item strong {
+            color: #15803d;
+            display: block;
+            margin-bottom: 0.25rem;
+        }
+
+        .verification-section {
+            background: #f0fdf4;
+            border: 2px solid #bbf7d0;
+            border-radius: 0.75rem;
+            padding: 1.5rem;
+            margin: 1rem 0;
+        }
+
+        @media (max-width: 768px) {
+            .main-title {
+                font-size: 2rem;
+            }
+            
+            .subtitle {
+                font-size: 1rem;
+            }
+            
+            .button-group {
+                flex-direction: column;
+                gap: 1rem;
+            }
+            
+            .btn {
+                width: 100%;
+            }
+            
+            .features-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .form-card {
+                padding: 2rem;
+                margin: 1rem;
+            }
+
+            .profile-actions {
+                grid-template-columns: 1fr;
+            }
+
+            .output-options {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- DUMMY DATABASE -->
+    <script>
+        // Dummy Database - Replace with real backend later
+        const DUMMY_DATABASE = {
+            farmers: {
+                '123456789012': {
+                    aadhaar: '123456789012',
+                    name: 'Ramesh Kumar',
+                    did: 'did:example:farmer:123456789012',
+                    properties: [
+                        {
+                            khasraNo: 'KH-4567',
+                            area: '2.5 acres',
+                            ownershipSince: '2015',
+                            currentStatus: 'Farming (Wheat)',
+                            verified: true,
+                            ownerAadhaar: '123456789012'
+                        },
+                        {
+                            khasraNo: 'KH-8901',
+                            area: '1.8 acres',
+                            ownershipSince: '2018',
+                            currentStatus: 'Farming (Rice)',
+                            verified: true,
+                            ownerAadhaar: '123456789012'
+                        },
+                        {
+                            khasraNo: 'KH-2345',
+                            area: '3.2 acres',
+                            ownershipSince: '2020',
+                            currentStatus: 'Personal Use',
+                            verified: true,
+                            ownerAadhaar: '123456789012'
+                        }
+                    ]
+                },
+                '987654321098': {
+                    aadhaar: '987654321098',
+                    name: 'Sita Devi',
+                    did: 'did:example:farmer:987654321098',
+                    properties: [
+                        {
+                            khasraNo: 'KH-1122',
+                            area: '4.0 acres',
+                            ownershipSince: '2012',
+                            currentStatus: 'Farming (Cotton)',
+                            verified: true,
+                            ownerAadhaar: '987654321098'
+                        }
+                    ]
+                }
+            }
+        };
+
+        // Generate unique reference ID
+        function generateReferenceId() {
+            return 'REF-' + Date.now().toString(36).toUpperCase() + '-' + Math.random().toString(36).substr(2, 4).toUpperCase();
+        }
+
+        // Simulate API delay
+        function simulateApiDelay() {
+            return new Promise(resolve => setTimeout(resolve, 2000));
+        }
+    </script>
+
+    <!-- HOME PAGE -->
+    <div id="homePage" class="page active">
+        <div class="background-overlay"></div>
+        <div class="content-container">
+            <div class="header-section">
+                <div class="icon-wheat">🌾</div>
+                <h1 class="main-title">🌾 Farmer Identity & Land Verification</h1>
+                <p class="subtitle">Empowering farmers through blockchain-based digital identity and land ownership verification</p>
+            </div>
+
+            <div class="button-group">
+                <button class="btn btn-login" onclick="showPage('loginPage')">
+                    <span>👤</span> Login
+                </button>
+                <button class="btn btn-signup" onclick="showPage('uidPage')">
+                    <span>✓</span> Sign Up
+                </button>
+            </div>
+
+            <div class="features-grid">
+                <div class="feature-card">
+                    <h3>Digital Identity</h3>
+                    <p>Secure blockchain-based farmer verification</p>
+                </div>
+                <div class="feature-card">
+                    <h3>Land Ownership</h3>
+                    <p>Geo-referenced land record verification</p>
+                </div>
+                <div class="feature-card">
+                    <h3>Financial Access</h3>
+                    <p>Unlock credit, subsidies & global markets</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- UID ENTRY PAGE -->
+    <div id="uidPage" class="page">
+        <button class="back-btn" onclick="showPage('homePage')">← Back</button>
+        <div class="form-container">
+            <div class="form-card">
+                <div class="form-header">
+                    <div class="form-icon">🏦</div>
+                    <h2>Enter Your UID</h2>
+                    <p>UID provided by your bank or agriculture office</p>
+                </div>
+
+                <div class="input-group">
+                    <label>UID (Unique ID)</label>
+                    <input type="text" id="uidInput" placeholder="Enter your UID">
+                </div>
+
+                <button class="btn btn-primary" onclick="handleUidSubmit()">
+                    Continue
+                </button>
+
+                <p class="form-footer">
+                    Already have your UID? 
+                    <a href="#" onclick="showPage('signupPage'); return false;">
+                        Click here
+                    </a>
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- SIGNUP PAGE -->
+    <div id="signupPage" class="page">
+        <button class="back-btn" onclick="showPage('homePage')">← Back</button>
+        <div class="form-container">
+            <div class="form-card">
+                <div class="form-header">
+                    <div class="form-icon">🌾</div>
+                    <h2>Onboard Farmer</h2>
+                    <p>Create your digital identity</p>
+                </div>
+
+                <div id="signupMessage"></div>
+
+                <div class="input-group">
+                    <label>Aadhar Number</label>
+                    <input type="text" id="signupAadhar" placeholder="Enter 12-digit Aadhar number" maxlength="12"
+                        onkeypress="handleEnter(event, 'register')">
+                </div>
+
+                <button class="btn btn-primary" id="registerBtn" onclick="handleRegister()">
+                    Register
+                </button>
+
+                <p class="form-footer">
+                    Already registered? 
+                    <a href="#" onclick="showPage('loginPage'); return false;">Login here</a>
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- LOGIN PAGE -->
+    <div id="loginPage" class="page">
+        <button class="back-btn" onclick="showPage('homePage')">← Back</button>
+        <div class="form-container">
+            <div class="form-card">
+                <div class="form-header">
+                    <div class="form-icon">👤</div>
+                    <h2>Farmer Login</h2>
+                    <p>Access your digital identity</p>
+                </div>
+
+                <div id="loginMessage"></div>
+
+                <div class="input-group">
+                    <label>Aadhar Number</label>
+                    <input type="text" id="loginAadhar" placeholder="Enter 12-digit Aadhar number" maxlength="12"
+                        onkeypress="handleEnter(event, 'login')">
+                </div>
+
+                <button class="btn btn-primary" id="loginBtn" onclick="handleLogin()">
+                    Login
+                </button>
+
+                <p class="form-footer">
+                    New farmer? 
+                    <a href="#" onclick="showPage('signupPage'); return false;">Sign up here</a>
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- FARMER DETAILS PAGE -->
+    <div id="farmerDetailsPage" class="page">
+        <button class="back-btn" onclick="showPage('homePage')">← Back to Home</button>
+        <div class="form-container">
+            <div class="form-card" style="max-width: 650px;">
+                <div class="form-header">
+                    <div class="form-icon">👨‍🌾</div>
+                    <h2>Farmer Profile</h2>
+                    <p>Your verified digital identity & land records</p>
+                </div>
+
+                <div id="farmerDetailsMessage"></div>
+                <input type="hidden" id="currentFarmerAadhaar">
+
+                <div id="farmerDetailsContent" style="display: none;">
+                    <div class="farmer-details-grid" id="farmerDetailsGrid"></div>
+                    
+                    <!-- Profile Action Buttons -->
+                    <div class="profile-actions">
+                        <button class="btn btn-primary" onclick="showAllProperties()">
+                            📋 View All Properties
+                        </button>
+                        <button class="btn btn-secondary" onclick="showVerifyLandForm()">
+                            🔍 Verify Land
+                        </button>
+                    </div>
+                    
+                    <!-- Land Verification Form -->
+                    <div id="verifyPropertyGroup" style="display: none;" class="verification-section">
+                        <h3 style="color: #15803d; margin-bottom: 1rem;">🔍 Land Verification</h3>
+                        <div class="input-group">
+                            <label>Enter Khasra Number</label>
+                            <input type="text" id="verifyKhasraInput" placeholder="Enter Khasra/Survey number">
+                        </div>
+                        <button class="btn btn-primary" id="verifyPropertyBtn" onclick="handleVerifyProperty()">
+                            Verify with Government Records
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentFarmer = null;
+        let currentKhasraNumber = null;
+        let currentVerificationRef = null;
+
+        // Page Navigation
+        function showPage(pageId) {
+            const pages = document.querySelectorAll('.page');
+            pages.forEach(page => page.classList.remove('active'));
+            
+            const targetPage = document.getElementById(pageId);
+            targetPage.classList.add('active');
+            
+            clearMessages();
+            if (pageId !== 'farmerDetailsPage') {
+                clearInputs();
+            }
+        }
+
+        function clearInputs() {
+            document.getElementById('signupAadhar').value = '';
+            document.getElementById('loginAadhar').value = '';
+            document.getElementById('uidInput').value = '';
+            document.getElementById('verifyKhasraInput').value = '';
+        }
+
+        function clearMessages() {
+            ['signupMessage', 'loginMessage', 'farmerDetailsMessage'].forEach(id => {
+                document.getElementById(id).innerHTML = '';
+            });
+        }
+
+        function showMessage(elementId, message, isError = false) {
+            const element = document.getElementById(elementId);
+            const className = isError ? 'error-box' : 'success-box';
+            element.innerHTML = `<div class="${className}"><p>${message}</p></div>`;
+        }
+
+        function handleEnter(event, action) {
+            if (event.key === 'Enter') {
+                event.preventDefault();
+                if (action === 'register') handleRegister();
+                else if (action === 'login') handleLogin();
+            }
+        }
+
+        function validateAadhar(aadharNumber) {
+            const cleanAadhar = aadharNumber.replace(/\D/g, '');
+            return cleanAadhar.length === 12;
+        }
+
+        // UID Submit Handler
+        function handleUidSubmit() {
+            const uid = document.getElementById('uidInput').value.trim();
+            if (!uid) {
+                showMessage('signupMessage', 'Please enter your UID', true);
+                return;
+            }
+            showPage('signupPage');
+        }
+
+        // Handle Registration
+        async function handleRegister() {
+            const aadharInput = document.getElementById('signupAadhar');
+            const aadharNumber = aadharInput.value.trim();
+            const btn = document.getElementById('registerBtn');
+            
+            if (!validateAadhar(aadharNumber)) {
+                showMessage('signupMessage', 'Please enter a valid 12-digit Aadhar number', true);
+                aadharInput.focus();
+                return;
+            }
+
+            btn.disabled = true;
+            btn.innerHTML = '<span class="loading"></span> Registering...';
+
+            await simulateApiDelay();
+
+            // Check if farmer exists
+            if (DUMMY_DATABASE.farmers[aadharNumber]) {
+                btn.disabled = false;
+                btn.innerHTML = 'Register';
+                showMessage('signupMessage', 'Farmer already registered! Please login.', true);
+                return;
+            }
+
+            // Create new farmer (simplified)
+            DUMMY_DATABASE.farmers[aadharNumber] = {
+                aadhaar: aadharNumber,
+                name: `Farmer ${aadharNumber.slice(-4)}`,
+                did: `did:example:farmer:${aadharNumber}`,
+                properties: []
+            };
+
+            btn.disabled = false;
+            btn.innerHTML = 'Register';
+            showMessage('signupMessage', `✓ Registration successful! Your DID: did:example:farmer:${aadharNumber}`);
+            
+            document.getElementById('currentFarmerAadhaar').value = aadharNumber;
+            setTimeout(() => {
+                showFarmerDetails(aadharNumber);
+            }, 2000);
+        }
+
+        // Handle Login
+        async function handleLogin() {
+            const aadharInput = document.getElementById('loginAadhar');
+            const aadharNumber = aadharInput.value.trim();
+            const btn = document.getElementById('loginBtn');
+            
+            if (!validateAadhar(aadharNumber)) {
+                showMessage('loginMessage', 'Please enter a valid 12-digit Aadhar number', true);
+                aadharInput.focus();
+                return;
+            }
+
+            btn.disabled = true;
+            btn.innerHTML = '<span class="loading"></span> Logging in...';
+
+            await simulateApiDelay();
+
+            if (!DUMMY_DATABASE.farmers[aadharNumber]) {
+                btn.disabled = false;
+                btn.innerHTML = 'Login';
+                showMessage('loginMessage', 'Farmer not found. Please register first.', true);
+                return;
+            }
+
+            btn.disabled = false;
+            btn.innerHTML = 'Login';
+            showMessage('loginMessage', '✓ Login successful!');
+            
+            document.getElementById('currentFarmerAadhaar').value = aadharNumber;
+            setTimeout(() => {
+                showFarmerDetails(aadharNumber);
+            }, 1500);
+        }
+
+        // Show Farmer Details
+        function showFarmerDetails(aadhaar) {
+            currentFarmer = DUMMY_DATABASE.farmers[aadhaar];
+            document.getElementById('currentFarmerAadhaar').value = aadhaar;
+            
+            const grid = document.getElementById('farmerDetailsGrid');
+            grid.innerHTML = `
+                <div class="detail-item">
+                    <strong>Aadhaar Number:</strong>
+                    <span>${currentFarmer.aadhaar}</span>
+                </div>
+                <div class="detail-item">
+                    <strong>Full Name:</strong>
+                    <span>${currentFarmer.name}</span>
+                </div>
+                <div class="detail-item">
+                    <strong>Digital ID (DID):</strong>
+                    <span>${currentFarmer.did}</span>
+                </div>
+                <div class="detail-item">
+                    <strong>Total Properties:</strong>
+                    <span>${currentFarmer.properties.length}</span>
+                </div>
+            `;
+            
+            document.getElementById('farmerDetailsContent').style.display = 'block';
+            showPage('farmerDetailsPage');
+        }
+
+        // Show All Properties
+        function showAllProperties() {
+            if (!currentFarmer || currentFarmer.properties.length === 0) {
+                showMessage('farmerDetailsMessage', 'No properties found for this farmer.', true);
+                return;
+            }
+
+            const grid = document.getElementById('farmerDetailsGrid');
+            grid.innerHTML = `
+                <div class="detail-item">
+                    <strong>Aadhaar Number:</strong>
+                    <span>${currentFarmer.aadhaar}</span>
+                </div>
+                <div class="detail-item">
+                    <strong>Full Name:</strong>
+                    <span>${currentFarmer.name}</span>
+                </div>
+                <div class="detail-item">
+                    <strong>Digital ID (DID):</strong>
+                    <span>${currentFarmer.did}</span>
+                </div>
+            `;
+
+            currentFarmer.properties.forEach((property, index) => {
+                grid.innerHTML += `
+                    <div class="detail-item">
+                        <strong>Property ${index + 1} - ${property.khasraNo}</strong>
+                        <p>Area: ${property.area} | Owned since: ${property.ownershipSince}</p>
+                        <p>Status: ${property.currentStatus} | Verified: ${property.verified ? '✅ Yes' : '❌ No'}</p>
+                    </div>
+                `;
+            });
+        }
+
+        // Show Verify Land Form
+        function showVerifyLandForm() {
+            document.getElementById('verifyPropertyGroup').style.display = 'block';
+            document.getElementById('verifyKhasraInput').focus();
+            document.getElementById('farmerDetailsMessage').innerHTML = '';
+        }
+
+        // Handle Property Verification
+        async function handleVerifyProperty() {
+            const khasraInput = document.getElementById('verifyKhasraInput');
+            const btn = document.getElementById('verifyPropertyBtn');
+            const khasraNumber = khasraInput.value.trim();
+
+            if (!khasraNumber) {
+                showMessage('farmerDetailsMessage', 'Please enter Khasra number', true);
+                return;
+            }
+
+            btn.disabled = true;
+            btn.innerHTML = '<span class="loading"></span> Verifying with government documents...';
+
+            await simulateApiDelay();
+
+            // Check if property belongs to current farmer
+            const property = currentFarmer.properties.find(p => p.khasraNo === khasraNumber);
+            
+            if (property && property.ownerAadhaar === currentFarmer.aadhaar) {
+                showMessage('farmerDetailsMessage', `
+                    ✓ The land verification is complete!<br><br>
+                    <strong>The property belongs to:</strong><br>
+                    Name: ${currentFarmer.name}<br>
+                    Aadhaar: ${currentFarmer.aadhaar}<br>
+                    Khasra: ${property.khasraNo}<br>
+                    Area: ${property.area}<br>
+                    Status: ${property.currentStatus}
+                `);
+            } else {
+                currentKhasraNumber = khasraNumber;
+                showOwnershipMismatchError();
+            }
+
+            btn.disabled = false;
+            btn.innerHTML = 'Verify with Government Records';
+            khasraInput.value = '';
+        }
+
+        // NEW: Show Ownership Mismatch with Clarification Option
+        function showOwnershipMismatchError() {
+            const message = `
+                ❌ This property does not belong to you.<br>
+                Name and Aadhaar number do not match government records.<br><br>
+                <strong>What you can do next:</strong><br>
+                If you believe this land belongs to you, please visit your nearest Tehsil / Taluk Office to request ownership clarification or correction.<br>
+                You may carry this verification reference to help the revenue officer locate your case faster.<br><br>
+                <button class="btn-clarification" onclick="requestOwnershipClarification()">
+                    📋 Request ownership clarification
+                </button>
+            `;
+            showMessage('farmerDetailsMessage', message, true);
+        }
+
+        // NEW: Request Ownership Clarification
+        async function requestOwnershipClarification() {
+            const refId = generateReferenceId();
+            currentVerificationRef = refId;
+            
+            const timestamp = new Date().toLocaleString('en-IN', {
+                timeZone: 'Asia/Kolkata',
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit'
+            });
+
+            document.getElementById('farmerDetailsMessage').innerHTML = `
+                <div class="clarification-section">
+                    <h3>📋 Ownership Clarification Request</h3>
+                    <div class="request-details">
+                        <div class="request-item">
+                            <span class="request-label">Aadhaar Number:</span>
+                            <span class="request-value">${currentFarmer.aadhaar}</span>
+                        </div>
+                        <div class="request-item">
+                            <span class="request-label">Khasra Number:</span>
+                            <span class="request-value">${currentKhasraNumber}</span>
+                        </div>
+                        <div class="request-item">
+                            <span class="request-label">Reason:</span>
+                            <span class="request-value">Ownership mismatch</span>
+                        </div>
+                        <div class="request-item">
+                            <span class="request-label">Timestamp:</span>
+                            <span class="request-value">${timestamp}</span>
+                        </div>
+                        <div class="request-item">
+                            <span class="request-label">Reference ID:</span>
+                            <span class="request-value">${refId}</span>
+                        </div>
+                    </div>
+                    
+                    <div class="success-box">
+                        <p><strong>⚠️ Important:</strong></p>
+                        <p>This request does not change land records. It prepares your case details for submission at the Tehsil Office.</p>
+                    </div>
+                    
+                    <div class="output-options">
+                        <button class="output-btn" onclick="downloadSummary()">
+                            📄 Download Summary (PDF)
+                        </button>
+                        <button class="output-btn" onclick="showTehsilOffice()">
+                            🗺️ Nearest Tehsil Office
+                        </button>
+                        <button class="output-btn" onclick="showDocumentsToCarry()">
+                            📝 Documents to Carry
+                        </button>
+                    </div>
+                </div>
+            `;
+        }
+
+        // NEW: Download Summary Function
+        function downloadSummary() {
+            const content = `
+Farmer Ownership Clarification Request
+
+Aadhaar: ${currentFarmer.aadhaar}
+Name: ${currentFarmer.name}
+Khasra Number: ${currentKhasraNumber}
+Reason: Ownership mismatch
+Reference ID: ${currentVerificationRef}
+Timestamp: ${new Date().toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' })}
+
+Visit your nearest Tehsil/Taluk office with this reference.
+            `;
+            
+            const blob = new Blob([content], { type: 'text/plain' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `clarification-${currentVerificationRef}.txt`;
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+
+        // NEW: Show Nearest Tehsil Office (Dummy data for Erode)
+        function showTehsilOffice() {
+            const tehsilInfo = `
+                <div class="success-box">
+                    <h3>🏛️ Nearest Tehsil Office</h3>
+                    <p><strong>Erode Taluk Office</strong></p>
+                    <p>Perundurai Road, Near Collector Office<br>
+                    Erode, Tamil Nadu - 638011</p>
+                    <p>📞 Phone: 0424-2258333<br>
+                    ⏰ Working Hours: 10:30 AM - 5:30 PM (Mon-Sat)</p>
+                </div>
+            `;
+            document.getElementById('farmerDetailsMessage').innerHTML += tehsilInfo;
+        }
+
+        // NEW: Show Documents to Carry
+        function showDocumentsToCarry() {
+            const docs = `
+                <div class="success-box">
+                    <h3>📋 Documents to Carry</h3>
+                    <ul style="color: #15803d; margin: 1rem 0;">
+                        <li>✅ Printed copy of this clarification request</li>
+                        <li>✅ Original Aadhaar card</li>
+                        <li>✅ Patta/Chitta extract (if available)</li>
+                        <li>✅ Any existing land documents</li>
+                        <li>✅ Proof of residency</li>
+                    </ul>
+                </div>
+            `;
+            document.getElementById('farmerDetailsMessage').innerHTML += docs;
+        }
+
+        // Initialize number-only inputs
+        document.addEventListener('DOMContentLoaded', function() {
+            const aadharInputs = ['signupAadhar', 'loginAadhar'];
+            aadharInputs.forEach(inputId => {
+                const input = document.getElementById(inputId);
+                if (input) {
+                    input.addEventListener('input', function(e) {
+                        this.value = this.value.replace(/\D/g, '');
+                    });
+                }
+            });
+        });
+    </script>
+</body>
+</html>

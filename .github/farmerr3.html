@@ -1,0 +1,659 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🌾 Farmer Identity & Land Verification</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            overflow-x: hidden;
+        }
+
+        .page {
+            display: none;
+            min-height: 100vh;
+            position: relative;
+        }
+
+        .page.active {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* HOME PAGE */
+        #homePage {
+            background: linear-gradient(135deg, #fef3c7 0%, #d9f99d 50%, #fef08a 100%);
+            position: relative;
+        }
+
+        .background-overlay {
+            position: absolute;
+            inset: 0;
+            opacity: 0.1;
+            background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23000000' fill-opacity='0.4'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+            pointer-events: none;
+        }
+
+        .content-container {
+            position: relative;
+            z-index: 10;
+            padding: 2rem;
+            text-align: center;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .header-section {
+            margin-bottom: 3rem;
+        }
+
+        .icon-wheat {
+            font-size: 5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .main-title {
+            font-size: 3.5rem;
+            font-weight: bold;
+            color: #000;
+            margin-bottom: 1rem;
+        }
+
+        .subtitle {
+            font-size: 1.25rem;
+            color: #374151;
+            max-width: 700px;
+            margin: 0 auto;
+            margin-top: 1.5rem;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 1.5rem;
+            justify-content: center;
+            margin: 2rem 0 4rem;
+        }
+
+        .btn {
+            padding: 1rem 2.5rem;
+            font-size: 1.125rem;
+            font-weight: 600;
+            border: none;
+            border-radius: 0.5rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+        }
+
+        .btn-login {
+            background: white;
+            color: #15803d;
+            border: 2px solid #15803d;
+        }
+
+        .btn-signup {
+            background: #15803d;
+            color: white;
+        }
+
+        .btn-signup:hover {
+            background: #166534;
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        .feature-card {
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(10px);
+            padding: 1.5rem;
+            border-radius: 0.5rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+
+        .feature-card h3 {
+            color: #15803d;
+            font-size: 1.125rem;
+            margin-bottom: 0.5rem;
+            font-weight: bold;
+        }
+
+        .feature-card p {
+            color: #4b5563;
+            font-size: 0.9rem;
+        }
+
+        /* FORM PAGES */
+        #signupPage, #loginPage, #uidPage, #farmerDetailsPage {
+            background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%);
+        }
+
+        .back-btn {
+            position: absolute;
+            top: 2rem;
+            left: 2rem;
+            padding: 0.75rem 1.5rem;
+            background: transparent;
+            border: none;
+            color: #15803d;
+            font-weight: 600;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: color 0.3s ease;
+        }
+
+        .back-btn:hover {
+            color: #166534;
+        }
+
+        .form-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            padding: 2rem;
+        }
+
+        .form-card {
+            background: white;
+            border-radius: 1rem;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+            padding: 3rem;
+            width: 100%;
+            max-width: 650px;
+        }
+
+        .form-header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .form-icon {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+        }
+
+        .form-header h2 {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #1f2937;
+            margin-bottom: 0.5rem;
+        }
+
+        .form-header p {
+            color: #6b7280;
+            font-size: 1rem;
+        }
+
+        .input-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .input-group label {
+            display: block;
+            color: #374151;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            font-size: 0.95rem;
+        }
+
+        .input-group input {
+            width: 100%;
+            padding: 0.875rem 1rem;
+            border: 2px solid #d1d5db;
+            border-radius: 0.5rem;
+            font-size: 1rem;
+            transition: border-color 0.3s ease;
+        }
+
+        .input-group input:focus {
+            outline: none;
+            border-color: #10b981;
+        }
+
+        .btn-primary {
+            width: 100%;
+            padding: 0.875rem;
+            background: #16a34a;
+            color: white;
+            font-weight: 600;
+            font-size: 1rem;
+            border: none;
+            border-radius: 0.5rem;
+            cursor: pointer;
+            transition: background 0.3s ease;
+            margin-bottom: 1rem;
+        }
+
+        .btn-primary:hover {
+            background: #15803d;
+        }
+
+        .btn-primary:disabled {
+            background: #9ca3af;
+            cursor: not-allowed;
+        }
+
+        .btn-secondary {
+            width: 100%;
+            padding: 0.875rem;
+            background: white;
+            color: #15803d;
+            font-weight: 600;
+            font-size: 1rem;
+            border: 2px solid #15803d;
+            border-radius: 0.5rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-bottom: 1rem;
+        }
+
+        .btn-secondary:hover {
+            background: #15803d;
+            color: white;
+        }
+
+        /* PROFILE ACTION BUTTONS */
+        .profile-actions {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+            margin: 2rem 0;
+        }
+
+        .profile-actions .btn {
+            width: 100%;
+            justify-content: center;
+            padding: 1rem;
+            font-size: 1rem;
+        }
+
+        /* ACTION BUTTONS IN MESSAGES */
+        .message-actions {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .message-actions .btn {
+            flex: 1;
+            min-width: 200px;
+            padding: 0.75rem;
+            font-size: 0.95rem;
+        }
+
+        .form-footer {
+            text-align: center;
+            color: #6b7280;
+            font-size: 0.9rem;
+            margin-top: 1.5rem;
+        }
+
+        .form-footer a {
+            color: #16a34a;
+            font-weight: 600;
+            text-decoration: none;
+        }
+
+        .form-footer a:hover {
+            text-decoration: underline;
+        }
+
+        .info-box {
+            margin-top: 2rem;
+            background: #d1fae5;
+            border-left: 4px solid #10b981;
+            padding: 1rem;
+            border-radius: 0.25rem;
+        }
+
+        .info-box p {
+            color: #374151;
+            font-size: 0.875rem;
+            line-height: 1.5;
+        }
+
+        .info-box strong {
+            color: #15803d;
+        }
+
+        .success-box {
+            background: #d1fae5;
+            border: 2px solid #10b981;
+            padding: 1.5rem;
+            border-radius: 0.5rem;
+            margin-bottom: 1.5rem;
+            text-align: left;
+        }
+
+        .success-box h3 {
+            color: #15803d;
+            margin-bottom: 1rem;
+            font-size: 1.2rem;
+        }
+
+        .success-box p {
+            color: #15803d;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+        }
+
+        .error-box {
+            background: #fee2e2;
+            border: 2px solid #ef4444;
+            padding: 1.5rem;
+            border-radius: 0.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .error-box p {
+            color: #dc2626;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .request-summary {
+            background: #fef3c7;
+            border: 2px solid #f59e0b;
+            border-radius: 0.75rem;
+            padding: 1.5rem;
+            margin: 1.5rem 0;
+        }
+
+        .request-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.75rem;
+            padding-bottom: 0.75rem;
+            border-bottom: 1px solid #f59e0b;
+        }
+
+        .request-item:last-child {
+            margin-bottom: 0;
+            border-bottom: none;
+        }
+
+        .request-label {
+            font-weight: 600;
+            color: #92400e;
+        }
+
+        .request-value {
+            font-family: monospace;
+            background: rgba(255,255,255,0.8);
+            padding: 0.25rem 0.5rem;
+            border-radius: 0.25rem;
+            font-size: 0.9rem;
+        }
+
+        .qr-code {
+            text-align: center;
+            margin: 1rem 0;
+            font-size: 3rem;
+        }
+
+        .loading {
+            display: inline-block;
+            width: 1rem;
+            height: 1rem;
+            border: 2px solid #fff;
+            border-top-color: transparent;
+            border-radius: 50%;
+            animation: spin 0.6s linear infinite;
+            margin-right: 0.5rem;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .farmer-details-grid {
+            display: grid;
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .detail-item {
+            background: #f8fafc;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            border-left: 4px solid #10b981;
+        }
+
+        .detail-item strong {
+            color: #15803d;
+            display: block;
+            margin-bottom: 0.25rem;
+        }
+
+        .verification-section {
+            background: #f0fdf4;
+            border: 2px solid #bbf7d0;
+            border-radius: 0.75rem;
+            padding: 1.5rem;
+            margin: 1rem 0;
+        }
+
+        @media (max-width: 768px) {
+            .main-title {
+                font-size: 2rem;
+            }
+            
+            .subtitle {
+                font-size: 1rem;
+            }
+            
+            .button-group {
+                flex-direction: column;
+                gap: 1rem;
+            }
+            
+            .btn {
+                width: 100%;
+            }
+            
+            .features-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .form-card {
+                padding: 2rem;
+                margin: 1rem;
+            }
+
+            .profile-actions {
+                grid-template-columns: 1fr;
+            }
+
+            .message-actions {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- DUMMY DATABASE -->
+    <script>
+        // Dummy Database - Replace with real backend later
+        const DUMMY_DATABASE = {
+            farmers: {
+                '123456789012': {
+                    aadhaar: '123456789012',
+                    name: 'Ramesh Kumar',
+                    did: 'did:example:farmer:123456789012',
+                    properties: [
+                        {
+                            khasraNo: 'KH-4567',
+                            area: '2.5 acres',
+                            ownershipSince: '2015',
+                            currentStatus: 'Farming (Wheat)',
+                            verified: true,
+                            ownerAadhaar: '123456789012'
+                        },
+                        {
+                            khasraNo: 'KH-8901',
+                            area: '1.8 acres',
+                            ownershipSince: '2018',
+                            currentStatus: 'Farming (Rice)',
+                            verified: true,
+                            ownerAadhaar: '123456789012'
+                        },
+                        {
+                            khasraNo: 'KH-2345',
+                            area: '3.2 acres',
+                            ownershipSince: '2020',
+                            currentStatus: 'Personal Use',
+                            verified: true,
+                            ownerAadhaar: '123456789012'
+                        }
+                    ]
+                },
+                '987654321098': {
+                    aadhaar: '987654321098',
+                    name: 'Sita Devi',
+                    did: 'did:example:farmer:987654321098',
+                    properties: [
+                        {
+                            khasraNo: 'KH-1122',
+                            area: '4.0 acres',
+                            ownershipSince: '2012',
+                            currentStatus: 'Farming (Cotton)',
+                            verified: true,
+                            ownerAadhaar: '987654321098'
+                        }
+                    ]
+                }
+            },
+            clarificationRequests: []
+        };
+
+        let currentFarmer = null;
+        let currentVerificationRef = null;
+
+        // Generate timestamp
+        function getCurrentTimestamp() {
+            return new Date().toLocaleString('en-IN', { 
+                timeZone: 'Asia/Kolkata',
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit'
+            });
+        }
+
+        // Generate unique reference ID
+        function generateRefId() {
+            return 'CLR-' + Date.now() + Math.random().toString(36).substr(2, 4).toUpperCase();
+        }
+
+        // Simulate API delay
+        function simulateApiDelay() {
+            return new Promise(resolve => setTimeout(resolve, 2000));
+        }
+    </script>
+
+    <!-- HOME PAGE -->
+    <div id="homePage" class="page active">
+        <div class="background-overlay"></div>
+        <div class="content-container">
+            <div class="header-section">
+                <div class="icon-wheat">🌾</div>
+                <h1 class="main-title">🌾 Farmer Identity & Land Verification</h1>
+                <p class="subtitle">Empowering farmers through blockchain-based digital identity and land ownership verification</p>
+            </div>
+
+            <div class="button-group">
+                <button class="btn btn-login" onclick="showPage('loginPage')">
+                    <span>👤</span> Login
+                </button>
+                <button class="btn btn-signup" onclick="showPage('uidPage')">
+                    <span>✓</span> Sign Up
+                </button>
+            </div>
+
+            <div class="features-grid">
+                <div class="feature-card">
+                    <h3>Digital Identity</h3>
+                    <p>Secure blockchain-based farmer verification</p>
+                </div>
+                <div class="feature-card">
+                    <h3>Land Ownership</h3>
+                    <p>Geo-referenced land record verification</p>
+                </div>
+                <div class="feature-card">
+                    <h3>Financial Access</h3>
+                    <p>Unlock credit, subsidies & global markets</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- UID ENTRY PAGE -->
+    <div id="uidPage" class="page">
+        <button class="back-btn" onclick="showPage('homePage')">← Back</button>
+        <div class="form-container">
+            <div class="form-card">
+                <div class="form-header">
+                    <div class="form-icon">🏦</div>
+                    <h2>Enter Your UID</h2>
+                    <p>UID provided by your bank or agriculture office</p>
+                </div>
+
+                <div class="input-group">
+                    <label>UID (Unique ID)</label>
+                    <input type="text" id="uidInput" placeholder="Enter your UID">
+                </div>
+
+                <button class="btn btn-primary" onclick="handleUidSubmit()">
+                    Continue
+                </button>
+
+                <p class="form-footer">
+                    Already have your UID? 
+                    <a href="#" onclick="showPage('signupPage'); return false;">
+                        Click here
+                    </a>
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- SIGNUP PAGE -->
+    <div id="signupPage" class="page">
+        <button class="back-btn" onclick="showPage('homePage')">← Back</button>
+        <div class="form-container">
+            <div class="form-card">
+                <div class="form-header">
+                    <div class="form-icon">🌾</div>
+                    <h2>Onboard Farmer</h2>
+                    <p>Create your digital identity</p>
+                </div>
+
+                <div id="signupMessage"></div>
+
+                <div class="input-group">
+                   
