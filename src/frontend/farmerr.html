@@ -372,7 +372,8 @@
                 <button class="btn btn-login" onclick="showPage('loginPage')">
                     <span>👤</span> Login
                 </button>
-                <button class="btn btn-signup" onclick="showPage('signupPage')">
+                <button class="btn btn-signup" onclick="showPage('uidPage')">
+
                     <span>✓</span> Sign Up
                 </button>
             </div>
@@ -393,6 +394,41 @@
             </div>
         </div>
     </div>
+
+            <!-- UID ENTRY PAGE -->
+<div id="uidPage" class="page">
+    <button class="back-btn" onclick="showPage('homePage')">← Back</button>
+    <div class="form-container">
+        <div class="form-card">
+            <div class="form-header">
+                <div class="form-icon">🏦</div>
+                <h2>Enter Your UID</h2>
+                <p>UID provided by your bank or agriculture office</p>
+            </div>
+
+            <div class="input-group">
+                <label>UID (Unique ID)</label>
+                <input 
+                    type="text" 
+                    id="uidInput" 
+                    placeholder="Enter your UID"
+                >
+            </div>
+
+            <button class="btn btn-primary" onclick="handleUidSubmit()">
+                Continue
+            </button>
+
+            <p class="form-footer">
+                Already have your UID? 
+                <a href="#" onclick="showPage('signupPage'); return false;">
+                    Click here
+                </a>
+            </p>
+        </div>
+    </div>
+</div>
+
 
     <!-- SIGNUP PAGE -->
     <div id="signupPage" class="page">
@@ -711,6 +747,19 @@
                 btn.innerHTML = '✓ Verify Land';
             }
         }
+        function handleUidSubmit() {
+    const uid = document.getElementById('uidInput').value.trim();
+
+    if (!uid) {
+        alert('Please enter your UID');
+        return;
+    }
+
+    // In real system: validate UID with backend
+    // For now: proceed to existing signup
+    showPage('signupPage');
+}
+
 
         // Only allow numbers in Aadhar input fields
         document.addEventListener('DOMContentLoaded', function() {
