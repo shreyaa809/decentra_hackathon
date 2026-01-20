@@ -1,0 +1,728 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🌾 Farmer Identity & Land Verification</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            overflow-x: hidden;
+        }
+
+        .page {
+            display: none;
+            min-height: 100vh;
+            position: relative;
+        }
+
+        .page.active {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* HOME PAGE */
+        #homePage {
+            background: linear-gradient(135deg, #fef3c7 0%, #d9f99d 50%, #fef08a 100%);
+            position: relative;
+        }
+
+        .background-overlay {
+            position: absolute;
+            inset: 0;
+            opacity: 0.1;
+            background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23000000' fill-opacity='0.4'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+            pointer-events: none;
+        }
+
+        .content-container {
+            position: relative;
+            z-index: 10;
+            padding: 2rem;
+            text-align: center;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .header-section {
+            margin-bottom: 3rem;
+        }
+
+        .icon-wheat {
+            font-size: 5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .main-title {
+            font-size: 3.5rem;
+            font-weight: bold;
+            color: #000;
+            margin-bottom: 1rem;
+        }
+
+        .subtitle {
+            font-size: 1.25rem;
+            color: #374151;
+            max-width: 700px;
+            margin: 0 auto;
+            margin-top: 1.5rem;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 1.5rem;
+            justify-content: center;
+            margin: 2rem 0 4rem;
+        }
+
+        .btn {
+            padding: 1rem 2.5rem;
+            font-size: 1.125rem;
+            font-weight: 600;
+            border: none;
+            border-radius: 0.5rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+        }
+
+        .btn-login {
+            background: white;
+            color: #15803d;
+            border: 2px solid #15803d;
+        }
+
+        .btn-signup {
+            background: #15803d;
+            color: white;
+        }
+
+        .btn-signup:hover {
+            background: #166534;
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        .feature-card {
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(10px);
+            padding: 1.5rem;
+            border-radius: 0.5rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+
+        .feature-card h3 {
+            color: #15803d;
+            font-size: 1.125rem;
+            margin-bottom: 0.5rem;
+            font-weight: bold;
+        }
+
+        .feature-card p {
+            color: #4b5563;
+            font-size: 0.9rem;
+        }
+
+        /* FORM PAGES */
+        #signupPage, #loginPage, #verifyLandPage {
+            background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%);
+        }
+
+        .back-btn {
+            position: absolute;
+            top: 2rem;
+            left: 2rem;
+            padding: 0.75rem 1.5rem;
+            background: transparent;
+            border: none;
+            color: #15803d;
+            font-weight: 600;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: color 0.3s ease;
+        }
+
+        .back-btn:hover {
+            color: #166534;
+        }
+
+        .form-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            padding: 2rem;
+        }
+
+        .form-card {
+            background: white;
+            border-radius: 1rem;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+            padding: 3rem;
+            width: 100%;
+            max-width: 450px;
+        }
+
+        .form-header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .form-icon {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+        }
+
+        .form-header h2 {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #1f2937;
+            margin-bottom: 0.5rem;
+        }
+
+        .form-header p {
+            color: #6b7280;
+            font-size: 1rem;
+        }
+
+        .input-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .input-group label {
+            display: block;
+            color: #374151;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            font-size: 0.95rem;
+        }
+
+        .input-group input {
+            width: 100%;
+            padding: 0.875rem 1rem;
+            border: 2px solid #d1d5db;
+            border-radius: 0.5rem;
+            font-size: 1rem;
+            transition: border-color 0.3s ease;
+        }
+
+        .input-group input:focus {
+            outline: none;
+            border-color: #10b981;
+        }
+
+        .btn-primary {
+            width: 100%;
+            padding: 0.875rem;
+            background: #16a34a;
+            color: white;
+            font-weight: 600;
+            font-size: 1rem;
+            border: none;
+            border-radius: 0.5rem;
+            cursor: pointer;
+            transition: background 0.3s ease;
+        }
+
+        .btn-primary:hover {
+            background: #15803d;
+        }
+
+        .btn-primary:disabled {
+            background: #9ca3af;
+            cursor: not-allowed;
+        }
+
+        .form-footer {
+            text-align: center;
+            color: #6b7280;
+            font-size: 0.9rem;
+            margin-top: 1.5rem;
+        }
+
+        .form-footer a {
+            color: #16a34a;
+            font-weight: 600;
+            text-decoration: none;
+        }
+
+        .form-footer a:hover {
+            text-decoration: underline;
+        }
+
+        .info-box {
+            margin-top: 2rem;
+            background: #d1fae5;
+            border-left: 4px solid #10b981;
+            padding: 1rem;
+            border-radius: 0.25rem;
+        }
+
+        .info-box p {
+            color: #374151;
+            font-size: 0.875rem;
+            line-height: 1.5;
+        }
+
+        .info-box strong {
+            color: #15803d;
+        }
+
+        .success-box {
+            background: #d1fae5;
+            border: 2px solid #10b981;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .success-box p {
+            color: #15803d;
+            font-weight: 600;
+        }
+
+        .error-box {
+            background: #fee2e2;
+            border: 2px solid #ef4444;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .error-box p {
+            color: #dc2626;
+            font-weight: 600;
+        }
+
+        .loading {
+            display: inline-block;
+            width: 1rem;
+            height: 1rem;
+            border: 2px solid #fff;
+            border-top-color: transparent;
+            border-radius: 50%;
+            animation: spin 0.6s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        @media (max-width: 768px) {
+            .main-title {
+                font-size: 2rem;
+            }
+            
+            .subtitle {
+                font-size: 1rem;
+            }
+            
+            .button-group {
+                flex-direction: column;
+                gap: 1rem;
+            }
+            
+            .btn {
+                width: 100%;
+            }
+            
+            .features-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .form-card {
+                padding: 2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- HOME PAGE -->
+    <div id="homePage" class="page active">
+        <div class="background-overlay"></div>
+        <div class="content-container">
+            <div class="header-section">
+                <div class="icon-wheat">🌾</div>
+                <h1 class="main-title">🌾 Farmer Identity & Land Verification</h1>
+                <p class="subtitle">Empowering farmers through blockchain-based digital identity and land ownership verification</p>
+            </div>
+
+            <div class="button-group">
+                <button class="btn btn-login" onclick="showPage('loginPage')">
+                    <span>👤</span> Login
+                </button>
+                <button class="btn btn-signup" onclick="showPage('signupPage')">
+                    <span>✓</span> Sign Up
+                </button>
+            </div>
+
+            <div class="features-grid">
+                <div class="feature-card">
+                    <h3>Digital Identity</h3>
+                    <p>Secure blockchain-based farmer verification</p>
+                </div>
+                <div class="feature-card">
+                    <h3>Land Ownership</h3>
+                    <p>Geo-referenced land record verification</p>
+                </div>
+                <div class="feature-card">
+                    <h3>Financial Access</h3>
+                    <p>Unlock credit, subsidies & global markets</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- SIGNUP PAGE -->
+    <div id="signupPage" class="page">
+        <button class="back-btn" onclick="showPage('homePage')">← Back</button>
+        <div class="form-container">
+            <div class="form-card">
+                <div class="form-header">
+                    <div class="form-icon">🌾</div>
+                    <h2>Onboard Farmer</h2>
+                    <p>Create your digital identity</p>
+                </div>
+
+                <div id="signupMessage"></div>
+
+                <div class="input-group">
+                    <label>Aadhar Number</label>
+                    <input 
+                        type="text" 
+                        id="signupAadhar" 
+                        placeholder="Enter 12-digit Aadhar number" 
+                        maxlength="12"
+                        onkeypress="handleEnter(event, 'register')"
+                    >
+                </div>
+
+                <button class="btn btn-primary" id="registerBtn" onclick="handleRegister()">
+                    Register
+                </button>
+
+                <p class="form-footer">
+                    Already registered? 
+                    <a href="#" onclick="showPage('loginPage'); return false;">Login here</a>
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- LOGIN PAGE -->
+    <div id="loginPage" class="page">
+        <button class="back-btn" onclick="showPage('homePage')">← Back</button>
+        <div class="form-container">
+            <div class="form-card">
+                <div class="form-header">
+                    <div class="form-icon">👤</div>
+                    <h2>Farmer Login</h2>
+                    <p>Access your digital identity</p>
+                </div>
+
+                <div id="loginMessage"></div>
+
+                <div class="input-group">
+                    <label>Aadhar Number</label>
+                    <input 
+                        type="text" 
+                        id="loginAadhar" 
+                        placeholder="Enter 12-digit Aadhar number" 
+                        maxlength="12"
+                        onkeypress="handleEnter(event, 'login')"
+                    >
+                </div>
+
+                <button class="btn btn-primary" id="loginBtn" onclick="handleLogin()">
+                    Login
+                </button>
+
+                <p class="form-footer">
+                    New farmer? 
+                    <a href="#" onclick="showPage('signupPage'); return false;">Sign up here</a>
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- VERIFY LAND PAGE -->
+    <div id="verifyLandPage" class="page">
+        <button class="back-btn" onclick="showPage('homePage')">← Back to Home</button>
+        <div class="form-container">
+            <div class="form-card">
+                <div class="form-header">
+                    <div class="form-icon">📍</div>
+                    <h2>Verify Land Ownership</h2>
+                    <p>Link your land records to blockchain</p>
+                </div>
+
+                <div id="verifyMessage"></div>
+
+                <div class="input-group">
+                    <label>Aadhar Number</label>
+                    <input 
+                        type="text" 
+                        id="verifyAadhar" 
+                        placeholder="Enter 12-digit Aadhar number" 
+                        maxlength="12"
+                        readonly
+                    >
+                </div>
+
+                <div class="input-group">
+                    <label>Khasra Number</label>
+                    <input 
+                        type="text" 
+                        id="khasraNumber" 
+                        placeholder="Enter Khasra/Survey number"
+                        onkeypress="handleEnter(event, 'verify')"
+                    >
+                </div>
+
+                <button class="btn btn-primary" id="verifyBtn" onclick="handleVerifyLand()">
+                    ✓ Verify Land
+                </button>
+
+                <div class="info-box">
+                    <p><strong>Note:</strong> Land verification creates an immutable blockchain record linking your identity to geo-referenced land ownership.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // API Configuration
+        const API_BASE_URL = 'http://localhost:4000';
+        const ROLE = 'officer'; // Change this based on your role
+
+        // Page Navigation
+        function showPage(pageId) {
+            const pages = document.querySelectorAll('.page');
+            pages.forEach(page => page.classList.remove('active'));
+            
+            const targetPage = document.getElementById(pageId);
+            targetPage.classList.add('active');
+            
+            clearMessages();
+            if (pageId !== 'verifyLandPage') {
+                clearInputs();
+            }
+        }
+
+        function clearInputs() {
+            document.getElementById('signupAadhar').value = '';
+            document.getElementById('loginAadhar').value = '';
+            document.getElementById('khasraNumber').value = '';
+        }
+
+        function clearMessages() {
+            document.getElementById('signupMessage').innerHTML = '';
+            document.getElementById('loginMessage').innerHTML = '';
+            document.getElementById('verifyMessage').innerHTML = '';
+        }
+
+        function showMessage(elementId, message, isError = false) {
+            const element = document.getElementById(elementId);
+            const className = isError ? 'error-box' : 'success-box';
+            element.innerHTML = `<div class="${className}"><p>${message}</p></div>`;
+        }
+
+        function handleEnter(event, action) {
+            if (event.key === 'Enter') {
+                event.preventDefault();
+                if (action === 'register') {
+                    handleRegister();
+                } else if (action === 'login') {
+                    handleLogin();
+                } else if (action === 'verify') {
+                    handleVerifyLand();
+                }
+            }
+        }
+
+        function validateAadhar(aadharNumber) {
+            const cleanAadhar = aadharNumber.replace(/\D/g, '');
+            return cleanAadhar.length === 12;
+        }
+
+        // API call helper
+        async function apiCall(endpoint, method = 'POST', body = null) {
+            try {
+                const options = {
+                    method,
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'x-role': ROLE
+                    }
+                };
+
+                if (body) {
+                    options.body = JSON.stringify(body);
+                }
+
+                const response = await fetch(`${API_BASE_URL}${endpoint}`, options);
+                const data = await response.json();
+
+                if (!response.ok) {
+                    throw new Error(data.error || 'Request failed');
+                }
+
+                return data;
+            } catch (error) {
+                throw error;
+            }
+        }
+
+        // Handle Registration
+        async function handleRegister() {
+            const aadharInput = document.getElementById('signupAadhar');
+            const aadharNumber = aadharInput.value.trim();
+            const btn = document.getElementById('registerBtn');
+            
+            if (!validateAadhar(aadharNumber)) {
+                showMessage('signupMessage', 'Please enter a valid 12-digit Aadhar number', true);
+                aadharInput.focus();
+                return;
+            }
+
+            btn.disabled = true;
+            btn.innerHTML = '<span class="loading"></span> Registering...';
+
+            try {
+                const result = await apiCall('/farmer/onboard', 'POST', { aadhaar: aadharNumber });
+                
+                showMessage('signupMessage', `✓ Registration successful! Your DID: ${result.did}`);
+                document.getElementById('verifyAadhar').value = aadharNumber;
+                
+                setTimeout(() => {
+                    showPage('verifyLandPage');
+                }, 2000);
+            } catch (error) {
+                showMessage('signupMessage', `Error: ${error.message}`, true);
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = 'Register';
+            }
+        }
+
+        // Handle Login
+        async function handleLogin() {
+            const aadharInput = document.getElementById('loginAadhar');
+            const aadharNumber = aadharInput.value.trim();
+            const btn = document.getElementById('loginBtn');
+            
+            if (!validateAadhar(aadharNumber)) {
+                showMessage('loginMessage', 'Please enter a valid 12-digit Aadhar number', true);
+                aadharInput.focus();
+                return;
+            }
+
+            btn.disabled = true;
+            btn.innerHTML = '<span class="loading"></span> Logging in...';
+
+            try {
+                // For login, we're just checking if the farmer exists by trying to verify
+                // You might want to add a separate endpoint for login verification
+                document.getElementById('verifyAadhar').value = aadharNumber;
+                showMessage('loginMessage', '✓ Login successful! Redirecting to land verification...');
+                
+                setTimeout(() => {
+                    showPage('verifyLandPage');
+                }, 1500);
+            } catch (error) {
+                showMessage('loginMessage', `Error: ${error.message}`, true);
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = 'Login';
+            }
+        }
+
+        // Handle Land Verification
+        async function handleVerifyLand() {
+            const aadharInput = document.getElementById('verifyAadhar');
+            const khasraInput = document.getElementById('khasraNumber');
+            const btn = document.getElementById('verifyBtn');
+            
+            const aadharNumber = aadharInput.value.trim();
+            const khasraNumber = khasraInput.value.trim();
+            
+            if (!validateAadhar(aadharNumber)) {
+                showMessage('verifyMessage', 'Please enter a valid 12-digit Aadhar number', true);
+                aadharInput.focus();
+                return;
+            }
+            
+            if (!khasraNumber) {
+                showMessage('verifyMessage', 'Please enter your Khasra/Survey number', true);
+                khasraInput.focus();
+                return;
+            }
+
+            btn.disabled = true;
+            btn.innerHTML = '<span class="loading"></span> Verifying...';
+
+            try {
+                const result = await apiCall('/land/verify', 'POST', {
+                    aadhaar: aadharNumber,
+                    khasraNo: khasraNumber,
+                    approvedByTehsildar: true
+                });
+
+                showMessage('verifyMessage', `
+                    ✓ Land verification successful!<br><br>
+                    <strong>Details:</strong><br>
+                    Khasra No: ${result.landCredential.khasraNo}<br>
+                    Owner Aadhaar: ${result.landCredential.ownerAadhaar}<br>
+                    Verified: ${result.landCredential.verified ? 'Yes' : 'No'}<br>
+                    Approved By: ${result.landCredential.approvedBy}<br><br>
+                    <strong>Benefits Unlocked:</strong><br>
+                    ✓ Access to credit facilities<br>
+                    ✓ Government subsidies<br>
+                    ✓ Global market access<br>
+                    ✓ Supply chain traceability
+                `);
+
+                khasraInput.value = '';
+            } catch (error) {
+                showMessage('verifyMessage', `Error: ${error.message}`, true);
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = '✓ Verify Land';
+            }
+        }
+
+        // Only allow numbers in Aadhar input fields
+        document.addEventListener('DOMContentLoaded', function() {
+            const aadharInputs = ['signupAadhar', 'loginAadhar', 'verifyAadhar'];
+            
+            aadharInputs.forEach(inputId => {
+                const input = document.getElementById(inputId);
+                input.addEventListener('input', function(e) {
+                    this.value = this.value.replace(/\D/g, '');
+                });
+            });
+        });
+    </script>
+</body>
+</html>
